@@ -16,7 +16,13 @@ import com.eomcs.pms.table.TaskTable;
 import com.eomcs.util.Request;
 import com.eomcs.util.Response;
 
-// 데이터를 파일에 보관하고 꺼내는 일을 할 애플리케이션
+//1) 외부의 스레드 사용
+//2) 스태틱 중첩 클래스로 정의한 스레드 사용
+//3) inner 클래스로 정의한 스레드 사용
+//4) 로컬 클래스로 정의한 스레드 사용
+//5) 익명 클래스로 정의한 스레드 사용
+//6) 직접 스레드를 만들지 않고 스레드 객체사 사용할 Runnable 구현체를 정의한다.
+//7) Runnable 구현체를 lambda 문법으로 정의한다.
 public class ServerApp {
 
   int port;
@@ -32,64 +38,24 @@ public class ServerApp {
   }
 
   public void service() {
-
     // 요청을 처리할 테이블 객체를 준비한다.
     tableMap.put("board/", new BoardTable());
     tableMap.put("member/", new MemberTable());
     tableMap.put("project/", new ProjectTable());
     tableMap.put("task/", new TaskTable());
 
-    // 클라이언트 연결을 기다는 서버 소켓 생성
+    // 클라이언트 연결을 기다리는 서버 소켓 생성
     try (ServerSocket serverSocket = new ServerSocket(this.port)) {
 
       System.out.println("서버 실행!");
 
-      processRequest(serverSocket.accept());
-
-    } catch (Exception e) {
-      System.out.println("서버 실행 중 오류 발생!");
-      e.printStackTrace();
-    }
-  }
-
-  private void processRequest(Socket socket) {
-    try (DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-        DataInputStream in = new DataInputStream(socket.getInputStream())) {
-
       while (true) {
-        Request request = receiveRequest(in);
-        log(request);
-
-        if (request.getCommand().equals("quit")) {
-          sendResponse(out, "success");
-          break;
-        }
-
-        DataTable dataTable = findDataTable(request.getCommand());
-
-        if (dataTable != null) {
-          Response response = new Response();
-          try {
-            dataTable.service(request, response);          
-            sendResponse(
-                out, 
-                "success", 
-                response.getDataList().toArray(new String[response.getDataList().size()]));
-
-          } catch (Exception e) {
-            sendResponse(
-                out, 
-                "error", 
-                e.getMessage() != null ? e.getMessage() : e.getClass().getName());
-          }
-
-        } else {
-          sendResponse(out, "error", "해당 요청을 처리할 수 없습니다!");
-        }
+        Socket socket = serverSocket.accept();
+        new Thread(() -> processRequest(socket)).start();
       }
 
     } catch (Exception e) {
-      System.out.println("클라이언트의 요청을 처리하는 중에 오류 발생!");
+      System.out.println("서버 실행 중 오류 발생!");
       e.printStackTrace();
     }
   }
@@ -149,5 +115,46 @@ public class ServerApp {
     }
   }
 
+  public void processRequest(Socket socket) {
+    try (DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+        DataInputStream in = new DataInputStream(socket.getInputStream())) {
+
+      while (true) {
+        Request request = receiveRequest(in);
+        log(request);
+
+        if (request.getCommand().equals("quit")) {
+          sendResponse(out, "success");
+          break;
+        }
+
+        DataTable dataTable = findDataTable(request.getCommand());
+
+        if (dataTable != null) {
+          Response response = new Response();
+          try {
+            dataTable.service(request, response);          
+            sendResponse(
+                out, 
+                "success", 
+                response.getDataList().toArray(new String[response.getDataList().size()]));
+
+          } catch (Exception e) {
+            sendResponse(
+                out, 
+                "error", 
+                e.getMessage() != null ? e.getMessage() : e.getClass().getName());
+          }
+
+        } else {
+          sendResponse(out, "error", "해당 요청을 처리할 수 없습니다!");
+        }
+      }
+
+    } catch (Exception e) {
+      System.out.println("클라이언트의 요청을 처리하는 중에 오류 발생!");
+      e.printStackTrace();
+    }
+  }
 
 }
