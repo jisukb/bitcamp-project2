@@ -15,11 +15,11 @@ public class BoardUpdateHandler implements Command {
 
     int no = Prompt.inputInt("번호? ");
 
-    try (Connection con = DriverManager.getConnection( //
+    try (Connection con = DriverManager.getConnection(
         "jdbc:mysql://localhost:3306/studydb?user=study&password=1111");
-        PreparedStatement stmt = con.prepareStatement( //
+        PreparedStatement stmt = con.prepareStatement( 
             "select no,title,content from pms_board where no = ?");
-        PreparedStatement stmt2 = con.prepareStatement( //
+        PreparedStatement stmt2 = con.prepareStatement( 
             "update pms_board set title=?, content=? where no = ?")) {
 
       Board board = new Board();

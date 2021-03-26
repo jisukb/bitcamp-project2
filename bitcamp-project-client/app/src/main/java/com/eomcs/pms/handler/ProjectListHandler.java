@@ -14,17 +14,15 @@ public class ProjectListHandler implements Command {
     try (Connection con = DriverManager.getConnection(
         "jdbc:mysql://localhost:3306/studydb?user=study&password=1111");
         PreparedStatement stmt = con.prepareStatement(
-            "select no,title,content,startDate,endDate,owner,members "
-                + "from pms_project order by no desc");
+            "select no,title,sdt,edt,owner,members from pms_project order by title asc");
         ResultSet rs = stmt.executeQuery()) {
 
       while (rs.next()) {
-        System.out.printf("%d, %s, %s, %s, %d\n", 
+        System.out.printf("%d, %s, %s, %s, %s, [%s]\n", 
             rs.getInt("no"), 
             rs.getString("title"), 
-            rs.getString("content"),
-            rs.getDate("startDate"),
-            rs.getDate("endDate"),
+            rs.getDate("sdt"),
+            rs.getDate("edt"),
             rs.getString("owner"),
             rs.getString("members"));
       }

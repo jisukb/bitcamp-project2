@@ -14,9 +14,9 @@ public class ProjectDetailHandler implements Command {
 
     int no = Prompt.inputInt("번호? ");
 
-    try (Connection con = DriverManager.getConnection( //
+    try (Connection con = DriverManager.getConnection(
         "jdbc:mysql://localhost:3306/studydb?user=study&password=1111");
-        PreparedStatement stmt = con.prepareStatement( //
+        PreparedStatement stmt = con.prepareStatement(
             "select * from pms_project where no = ?")) {
 
       stmt.setInt(1, no);
@@ -29,8 +29,8 @@ public class ProjectDetailHandler implements Command {
 
         System.out.printf("프로젝트명: %s\n", rs.getString("title"));
         System.out.printf("내용: %s\n", rs.getString("content"));
-        System.out.printf("시작일: %s\n", rs.getDate("startDate"));
-        System.out.printf("종료일: %s\n", rs.getDate("endDate"));
+        System.out.printf("시작일: %s\n", rs.getDate("sdt"));
+        System.out.printf("종료일: %s\n", rs.getDate("edt"));
         System.out.printf("관리자: %s\n", rs.getString("owner"));
         System.out.printf("팀원: %s\n", rs.getString("members"));
       }
