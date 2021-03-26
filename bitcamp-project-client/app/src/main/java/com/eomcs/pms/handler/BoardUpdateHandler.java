@@ -17,10 +17,10 @@ public class BoardUpdateHandler implements Command {
 
     try (Connection con = DriverManager.getConnection(
         "jdbc:mysql://localhost:3306/studydb?user=study&password=1111");
-        PreparedStatement stmt = con.prepareStatement( 
-            "select no,title,content from pms_board where no = ?");
-        PreparedStatement stmt2 = con.prepareStatement( 
-            "update pms_board set title=?, content=? where no = ?")) {
+        PreparedStatement stmt = con.prepareStatement(
+            "select no,title,content from pms_board where no=?");
+        PreparedStatement stmt2 = con.prepareStatement(
+            "update pms_board set title=?, content=? where no=?")) {
 
       Board board = new Board();
 
@@ -32,7 +32,7 @@ public class BoardUpdateHandler implements Command {
           return;
         }
 
-        board.setNo(no);
+        board.setNo(no); 
         board.setTitle(rs.getString("title"));
         board.setContent(rs.getString("content"));
       }
@@ -57,6 +57,7 @@ public class BoardUpdateHandler implements Command {
     }
   }
 }
+
 
 
 

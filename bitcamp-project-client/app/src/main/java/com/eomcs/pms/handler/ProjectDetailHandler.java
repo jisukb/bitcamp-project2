@@ -14,10 +14,10 @@ public class ProjectDetailHandler implements Command {
 
     int no = Prompt.inputInt("번호? ");
 
-    try (Connection con = DriverManager.getConnection(
+    try (Connection con = DriverManager.getConnection( //
         "jdbc:mysql://localhost:3306/studydb?user=study&password=1111");
-        PreparedStatement stmt = con.prepareStatement(
-            "select * from pms_project where no = ?")) {
+        PreparedStatement stmt = con.prepareStatement( //
+            "select * from pms_project where no=?")) {
 
       stmt.setInt(1, no);
 
@@ -37,6 +37,7 @@ public class ProjectDetailHandler implements Command {
     }
   }
 }
+
 
 
 

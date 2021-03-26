@@ -23,10 +23,11 @@ public class MemberDetailHandler implements Command {
 
       try (ResultSet rs = stmt.executeQuery()) {
         if (!rs.next()) {
-          System.out.println("해당 번호의 게시글이 없습니다.");
+          System.out.println("해당 번호의 회원이 없습니다.");
           return;
         }
-        System.out.printf("이름: %s\n",  rs.getString("name"));
+
+        System.out.printf("이름: %s\n", rs.getString("name"));
         System.out.printf("이메일: %s\n", rs.getString("email"));
         System.out.printf("사진: %s\n", rs.getString("photo"));
         System.out.printf("전화: %s\n", rs.getString("tel"));
@@ -35,6 +36,7 @@ public class MemberDetailHandler implements Command {
     }
   }
 }
+
 
 
 

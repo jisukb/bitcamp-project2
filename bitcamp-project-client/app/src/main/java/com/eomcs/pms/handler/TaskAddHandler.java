@@ -14,12 +14,12 @@ public class TaskAddHandler implements Command {
     this.memberValidator = memberValidator;
   }
 
+
   @Override
   public void service() throws Exception {
     System.out.println("[작업 등록]");
 
     Task t = new Task();
-
     t.setContent(Prompt.inputString("내용? "));
     t.setDeadline(Prompt.inputDate("마감일? "));
     t.setStatus(Prompt.inputInt("상태?\n0: 신규\n1: 진행중\n2: 완료\n> "));
@@ -39,10 +39,10 @@ public class TaskAddHandler implements Command {
       stmt.setDate(2, t.getDeadline());
       stmt.setString(3, t.getOwner());
       stmt.setInt(4, t.getStatus());
-
       stmt.executeUpdate();
 
       System.out.println("작업을 등록했습니다.");
     }
+
   }
 }

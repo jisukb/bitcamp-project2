@@ -15,9 +15,9 @@ public class TaskDetailHandler implements Command {
 
     int no = Prompt.inputInt("번호? ");
 
-    try (Connection con = DriverManager.getConnection(
+    try (Connection con = DriverManager.getConnection( //
         "jdbc:mysql://localhost:3306/studydb?user=study&password=1111");
-        PreparedStatement stmt = con.prepareStatement(
+        PreparedStatement stmt = con.prepareStatement( //
             "select * from pms_task where no=?")) {
 
       stmt.setInt(1, no);
@@ -28,10 +28,10 @@ public class TaskDetailHandler implements Command {
           return;
         }
 
-        System.out.printf("내용: %s\n", rs.getString("title"));
-        System.out.printf("마감일: %s\n", rs.getDate("content"));
-        System.out.printf("담당자: %s\n", rs.getString("owner"));
+        System.out.printf("내용: %s\n", rs.getString("content"));
+        System.out.printf("마감일: %s\n", rs.getDate("deadline"));
         System.out.printf("상태: %s\n", Task.getStatusLabel(rs.getInt("status")));
+        System.out.printf("담당자: %s\n", rs.getString("owner"));
       }
     }
   }

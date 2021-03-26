@@ -17,15 +17,15 @@ public class BoardSearchHandler implements Command {
       return;
     }
 
-    try (Connection con = DriverManager.getConnection( //
+    try (Connection con = DriverManager.getConnection(
         "jdbc:mysql://localhost:3306/studydb?user=study&password=1111");
-        PreparedStatement stmt = con.prepareStatement( //
+        PreparedStatement stmt = con.prepareStatement(
             "select no,title,writer,cdt,vw_cnt"
-            + " from pms_board"
-            + " where title like concat('%',?,'%')"
-            + " or content like concat('%',?,'%')"
-            + " or writer like concat('%',?,'%')"
-            + " order by no desc")) {
+                + " from pms_board"
+                + " where title like concat('%',?,'%')"
+                + " or content like concat('%',?,'%')"
+                + " or writer like concat('%',?,'%')"
+                + " order by no desc")) {
 
       stmt.setString(1, keyword);
       stmt.setString(2, keyword);
@@ -49,6 +49,7 @@ public class BoardSearchHandler implements Command {
     }
   }
 }
+
 
 
 

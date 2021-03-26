@@ -15,7 +15,7 @@ public class TaskListHandler implements Command {
     try (Connection con = DriverManager.getConnection(
         "jdbc:mysql://localhost:3306/studydb?user=study&password=1111");
         PreparedStatement stmt = con.prepareStatement(
-            "select no,content,deadline,owner,status from pms_task order by no desc");
+            "select no,content,deadline,owner,status from pms_task order by content asc");
         ResultSet rs = stmt.executeQuery()) {
 
       while (rs.next()) {
