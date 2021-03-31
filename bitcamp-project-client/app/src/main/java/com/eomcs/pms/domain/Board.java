@@ -60,4 +60,5 @@ public class Board {
     this.like = like;
   }
 
+
 }
