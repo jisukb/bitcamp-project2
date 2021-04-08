@@ -1,8 +1,6 @@
 package com.eomcs.pms;
 
 import java.io.InputStream;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -35,13 +33,18 @@ import com.eomcs.pms.handler.MemberValidator;
 import com.eomcs.pms.handler.ProjectAddHandler;
 import com.eomcs.pms.handler.ProjectDeleteHandler;
 import com.eomcs.pms.handler.ProjectDetailHandler;
+import com.eomcs.pms.handler.ProjectDetailSearchHandler;
 import com.eomcs.pms.handler.ProjectListHandler;
+import com.eomcs.pms.handler.ProjectMemberDeleteHandler;
+import com.eomcs.pms.handler.ProjectMemberUpdateHandler;
+import com.eomcs.pms.handler.ProjectSearchHandler;
 import com.eomcs.pms.handler.ProjectUpdateHandler;
 import com.eomcs.pms.handler.TaskAddHandler;
 import com.eomcs.pms.handler.TaskDeleteHandler;
 import com.eomcs.pms.handler.TaskDetailHandler;
 import com.eomcs.pms.handler.TaskListHandler;
 import com.eomcs.pms.handler.TaskUpdateHandler;
+import com.eomcs.pms.service.BoardService;
 import com.eomcs.util.Prompt;
 
 public class ClientApp {
@@ -80,28 +83,26 @@ public class ClientApp {
     SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(mybatisConfigStream);
 
     // DAO가 사용할 SqlSession 객체 준비
-    // => 단 auto commit 으로 동작하는 SqlSession 객체를 준비한다.
-    SqlSession sqlSession = sqlSessionFactory.openSession(true);
-
-    // DB Connection 객체 생성
-    Connection con = DriverManager.getConnection(
-        "jdbc:mysql://localhost:3306/studydb?user=study&password=1111");
+    // => 수동 commit 으로 동작하는 SqlSession 객체를 준비한다.
+    SqlSession sqlSession = sqlSessionFactory.openSession(false);
 
     // 핸들러가 사용할 DAO 객체 준비
     BoardDao boardDao = new BoardDaoImpl(sqlSession);
     MemberDao memberDao = new MemberDaoImpl(sqlSession);
-    ProjectDao projectDao = new ProjectDaoImpl(con);
+    ProjectDao projectDao = new ProjectDaoImpl(sqlSession);
     TaskDao taskDao = new TaskDaoImpl(sqlSession);
+
+    BoardService boardService = new BoardService(sqlSession, boardDao);
 
     // 사용자 명령을 처리하는 객체를 맵에 보관한다.
     HashMap<String,Command> commandMap = new HashMap<>();
 
-    commandMap.put("/board/add", new BoardAddHandler(boardDao));
-    commandMap.put("/board/list", new BoardListHandler(boardDao));
-    commandMap.put("/board/detail", new BoardDetailHandler(boardDao));
-    commandMap.put("/board/update", new BoardUpdateHandler(boardDao));
-    commandMap.put("/board/delete", new BoardDeleteHandler(boardDao));
-    commandMap.put("/board/search", new BoardSearchHandler(boardDao));
+    commandMap.put("/board/add", new BoardAddHandler(boardService));
+    commandMap.put("/board/list", new BoardListHandler(boardService));
+    commandMap.put("/board/detail", new BoardDetailHandler(boardService));
+    commandMap.put("/board/update", new BoardUpdateHandler(boardService));
+    commandMap.put("/board/delete", new BoardDeleteHandler(boardService));
+    commandMap.put("/board/search", new BoardSearchHandler(boardService));
 
     commandMap.put("/member/add", new MemberAddHandler(memberDao));
     commandMap.put("/member/list", new MemberListHandler(memberDao));
@@ -115,7 +116,11 @@ public class ClientApp {
     commandMap.put("/project/list", new ProjectListHandler(projectDao));
     commandMap.put("/project/detail", new ProjectDetailHandler(projectDao));
     commandMap.put("/project/update", new ProjectUpdateHandler(projectDao, memberValidator));
-    commandMap.put("/project/delete", new ProjectDeleteHandler(projectDao));
+    commandMap.put("/project/delete", new ProjectDeleteHandler(projectDao, taskDao));
+    commandMap.put("/project/search", new ProjectSearchHandler(projectDao));
+    commandMap.put("/project/detailSearch", new ProjectDetailSearchHandler(projectDao));
+    commandMap.put("/project/memberUpdate", new ProjectMemberUpdateHandler(projectDao, memberValidator));
+    commandMap.put("/project/memberDelete", new ProjectMemberDeleteHandler(projectDao));
 
     commandMap.put("/task/add", new TaskAddHandler(taskDao, projectDao, memberValidator));
     commandMap.put("/task/list", new TaskListHandler(taskDao));
@@ -170,7 +175,7 @@ public class ClientApp {
       System.out.println("서버와 통신 하는 중에 오류 발생!");
     }
 
-    con.close();
+    sqlSession.close();
     Prompt.close();
   }
 

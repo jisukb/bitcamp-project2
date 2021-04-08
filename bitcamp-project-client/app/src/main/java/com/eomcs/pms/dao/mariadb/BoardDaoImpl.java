@@ -7,7 +7,6 @@ import com.eomcs.pms.domain.Board;
 
 public class BoardDaoImpl implements BoardDao {
 
-  // auto commit 객체 받기
   SqlSession sqlSession;
 
   public BoardDaoImpl(SqlSession sqlSession) throws Exception {
@@ -17,11 +16,6 @@ public class BoardDaoImpl implements BoardDao {
   @Override
   public int insert(Board board) throws Exception {
     return sqlSession.insert("BoardMapper.insert", board);
-  }
-
-  @Override
-  public List<Board> findAll() throws Exception {
-    return sqlSession.selectList("BoardMapper.findAll");
   }
 
   @Override
@@ -49,3 +43,4 @@ public class BoardDaoImpl implements BoardDao {
     return sqlSession.selectList("BoardMapper.findByKeyword", keyword);
   }
 }
+
