@@ -17,3 +17,10 @@ public interface BoardService {
 
   List<Board> search(String keyword) throws Exception;
 }
+
+
+
+
+
+
+

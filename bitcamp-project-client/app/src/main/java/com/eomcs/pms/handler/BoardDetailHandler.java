@@ -3,8 +3,10 @@ package com.eomcs.pms.handler;
 import java.text.SimpleDateFormat;
 import com.eomcs.pms.domain.Board;
 import com.eomcs.pms.service.BoardService;
+import com.eomcs.stereotype.Component;
 import com.eomcs.util.Prompt;
 
+@Component(value="/board/detail")
 public class BoardDetailHandler implements Command {
 
   SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -35,3 +37,9 @@ public class BoardDetailHandler implements Command {
     System.out.printf("좋아요: %s\n", b.getLike());
   }
 }
+
+
+
+
+
+

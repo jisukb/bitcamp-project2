@@ -10,7 +10,7 @@ public class DefaultBoardService implements BoardService {
 
   SqlSession sqlSession;
 
-  BoardDao boardDao;
+  BoardDao boardDao; 
 
   public DefaultBoardService(SqlSession sqlSession, BoardDao boardDao) {
     this.sqlSession = sqlSession;
@@ -64,3 +64,10 @@ public class DefaultBoardService implements BoardService {
     return boardDao.findByKeyword(keyword);
   }
 }
+
+
+
+
+
+
+
