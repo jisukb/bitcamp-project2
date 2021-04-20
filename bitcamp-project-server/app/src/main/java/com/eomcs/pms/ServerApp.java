@@ -27,6 +27,7 @@ import com.eomcs.pms.dao.MemberDao;
 import com.eomcs.pms.dao.ProjectDao;
 import com.eomcs.pms.dao.TaskDao;
 import com.eomcs.pms.handler.Command;
+import com.eomcs.pms.handler.MemberValidator;
 import com.eomcs.pms.service.BoardService;
 import com.eomcs.pms.service.MemberService;
 import com.eomcs.pms.service.ProjectService;
@@ -38,6 +39,8 @@ import com.eomcs.pms.service.impl.DefaultTaskService;
 import com.eomcs.stereotype.Component;
 import com.eomcs.util.CommandRequest;
 import com.eomcs.util.CommandResponse;
+import com.eomcs.util.Prompt;
+import com.eomcs.util.Session;
 
 public class ServerApp {
 
@@ -99,14 +102,14 @@ public class ServerApp {
     TaskService taskService = new DefaultTaskService(sqlSession, taskDao);
 
     // => 도우미 객체 생성
-    //MemberValidator memberValidator = new MemberValidator(memberService);
+    MemberValidator memberValidator = new MemberValidator(memberService);
 
     // => Command 구현체가 사용할 의존 객체 보관
     objMap.put("boardService", boardService);
     objMap.put("memberService", memberService);
     objMap.put("projectService", projectService);
     objMap.put("taskService", taskService);
-    //objMap.put("memberValidator", memberValidator);
+    objMap.put("memberValidator", memberValidator);
 
     // 5) Command 구현체를 자동 생성하여 맵에 등록
     registerCommands();
@@ -159,6 +162,7 @@ public class ServerApp {
     System.out.println("서버 종료!");
   }
 
+  // 클라이언트가 접속했을 때 스레드가 호출하는 메서드
   public void processRequest(Socket socket) {
     try (
         Socket clientSocket = socket;
@@ -168,6 +172,12 @@ public class ServerApp {
 
       // 클라이언트가 보낸 명령을 Command 구현체에게 전달하기 쉽도록 객체에 담는다.
       InetSocketAddress remoteAddr = (InetSocketAddress) clientSocket.getRemoteSocketAddress();
+
+      // 클라이언트로부터 값을 입력 받을 때 사용할 객체를 준비한다.
+      Prompt prompt = new Prompt(in, out);
+
+      // 클라이언트가 접속해 있는 동안 사용할 저장소를 준비한다.
+      Session session = new Session();
 
       while (true) {
         // 클라이언트가 보낸 요청을 읽는다.
@@ -214,7 +224,9 @@ public class ServerApp {
         CommandRequest request = new CommandRequest(
             requestLine, 
             remoteAddr.getHostString(),
-            remoteAddr.getPort());
+            remoteAddr.getPort(), 
+            prompt,
+            session);
 
         CommandResponse response = new CommandResponse(out);
 
@@ -223,6 +235,7 @@ public class ServerApp {
           command.service(request, response);
         } catch (Exception e) {
           out.println("서버 오류 발생!");
+          e.printStackTrace();
         }
         out.println();
         out.flush();
