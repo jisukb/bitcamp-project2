@@ -19,6 +19,8 @@ public class LogoutHandler implements Command {
       return;
     }
 
+    request.getSession().invalidate();
+
     out.printf("%s 님 안녕히 가세요!\n", member.getName());
   }
 }
