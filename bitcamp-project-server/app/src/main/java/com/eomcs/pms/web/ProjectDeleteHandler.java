@@ -9,48 +9,53 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.eomcs.pms.domain.Member;
-import com.eomcs.pms.service.MemberService;
+import com.eomcs.pms.domain.Project;
+import com.eomcs.pms.service.ProjectService;
 
 @SuppressWarnings("serial")
-@WebServlet("/login")
-public class LoginHandler extends HttpServlet {
+@WebServlet("/project/delete")
+public class ProjectDeleteHandler extends HttpServlet {
 
   @Override
   protected void service(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
 
-    MemberService memberService = (MemberService) request.getServletContext().getAttribute("memberService");
+    ProjectService projectService = (ProjectService) request.getServletContext().getAttribute("projectService");
 
     response.setContentType("text/plain;charset=UTF-8");
     PrintWriter out = response.getWriter();
 
-    out.println("[로그인]");
-
-    String email = request.getParameter("email");
-    String password = request.getParameter("password");
+    out.println("[프로젝트 삭제]");
 
     try {
-      Member member = memberService.get(email, password);
-      if (member == null) {
-        out.println("사용자 정보가 맞지 않습니다.");
-        // 로그인 실패한다면 세션 객체의 모든 내용을 삭제한다.
-        request.getSession().invalidate(); // 
+      int no = Integer.parseInt(request.getParameter("no"));
+
+      Project oldProject = projectService.get(no);
+
+      if (oldProject == null) {
+        out.println("해당 번호의 프로젝트가 없습니다.");
         return;
       }
 
-      // 로그인 성공한다면, 로그인 사용자 정보를 세션 객체에 보관한다.
-      request.getSession().setAttribute("loginUser", member);
+      Member loginUser = (Member) request.getSession().getAttribute("loginUser");
+      if (oldProject.getOwner().getNo() != loginUser.getNo()) {
+        out.println("삭제 권한이 없습니다!");
+        return;
+      }
 
-      out.printf("%s 님 환영합니다.\n", member.getName());
+      projectService.delete(no);
+      out.println("프로젝트를 삭제하였습니다.");
 
     } catch (Exception e) {
       StringWriter strWriter = new StringWriter();
       PrintWriter printWriter = new PrintWriter(strWriter);
       e.printStackTrace(printWriter);
       out.println(strWriter.toString());
-    } 
+    }
   }
 }
+
+
 
 
 
