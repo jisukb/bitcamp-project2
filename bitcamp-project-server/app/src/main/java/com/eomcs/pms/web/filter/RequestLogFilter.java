@@ -9,14 +9,14 @@ import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 
-@WebFilter("/*") 
+@WebFilter("/*")
 public class RequestLogFilter implements Filter {
 
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain nextChain)
       throws IOException, ServletException {
 
-    // 파라미터로 받은 request 의 본래 타입으로 형변환 한다.
+    // 파라미터로 받은 request를 본래 타입으로 형변환 한다.
     HttpServletRequest httpRequest = (HttpServletRequest) request;
 
     // 다음 체인을 수행하기 전에 요청 정보를 출력한다.
@@ -30,5 +30,11 @@ public class RequestLogFilter implements Filter {
 
   }
 }
+
+
+
+
+
+
 
 
