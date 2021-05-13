@@ -2,7 +2,6 @@ package com.eomcs.pms.web;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -18,7 +17,7 @@ import com.eomcs.pms.service.ProjectService;
 public class ProjectListHandler extends HttpServlet {
 
   @Override
-  protected void doGet(HttpServletRequest request, HttpServletResponse response)
+  protected void service(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
 
     ProjectService projectService = (ProjectService) request.getServletContext().getAttribute("projectService");
@@ -34,7 +33,7 @@ public class ProjectListHandler extends HttpServlet {
     out.println("<body>");
     out.println("<h1>프로젝트</h1>");
 
-    out.println("<p><a href='add'>새 프로젝트</a></p>");
+    out.println("<p><a href='add1'>새 프로젝트</a></p>");
 
     try {
       List<Project> projects = null;
@@ -129,13 +128,9 @@ public class ProjectListHandler extends HttpServlet {
       out.println("</form>");
 
     } catch (Exception e) {
-      // 상세 오류 내용을 StringWriter로 출력한다.
-      StringWriter strWriter = new StringWriter();
-      PrintWriter printWriter = new PrintWriter(strWriter);
-      e.printStackTrace(printWriter);
-
-      // StringWriter 에 들어 있는 출력 내용을 꺼내 클라이언트로 보낸다.
-      out.printf("<pre>%s</pre>\n", strWriter.toString());
+      request.setAttribute("exception", e);
+      request.getRequestDispatcher("/error").forward(request, response);
+      return;
     }
 
     out.println("</body>");
