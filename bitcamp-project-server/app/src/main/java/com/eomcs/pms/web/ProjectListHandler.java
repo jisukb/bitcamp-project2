@@ -17,7 +17,7 @@ import com.eomcs.pms.service.ProjectService;
 public class ProjectListHandler extends HttpServlet {
 
   @Override
-  protected void service(HttpServletRequest request, HttpServletResponse response)
+  protected void doGet(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
 
     ProjectService projectService = (ProjectService) request.getServletContext().getAttribute("projectService");
@@ -128,9 +128,7 @@ public class ProjectListHandler extends HttpServlet {
       out.println("</form>");
 
     } catch (Exception e) {
-      request.setAttribute("exception", e);
-      request.getRequestDispatcher("/error").forward(request, response);
-      return;
+      throw new ServletException(e);
     }
 
     out.println("</body>");
